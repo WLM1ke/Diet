@@ -43,7 +43,7 @@ class Diet:
                         addition = eval(v)
                     else:
                         addition = eval(v) * i[2] ** self.factor
-                    self.menu[k] += (addition - self.eaten.get(k, 0))
+                    self.menu[k] = self.menu.get(k, 0) + (addition - self.eaten.get(k, 0))
             self.eaten = {}
             self.date = date.today().isoformat()
             self.save()
