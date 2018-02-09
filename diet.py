@@ -25,7 +25,7 @@ class Diet:
                 dump = json.load(fin)
             for k, v in dump.items():
                 setattr(self, k, v)
-            self.newday()
+            self.new_day()
             return True
         except FileNotFoundError:
             return False
@@ -34,7 +34,7 @@ class Diet:
         with Path(__file__).parent.joinpath(self.name).open("w") as fout:
             json.dump(vars(self), fout, indent=2, sort_keys=True)
 
-    def newday(self):
+    def new_day(self):
         if self.date != date.today().isoformat():
             self.change_factor()
             for i in settings.amer_diet:
@@ -70,12 +70,17 @@ class Diet:
         menu = self.menu
         eaten = self.eaten
         for dish in sorted(menu):
-            show_flag = False
+            show = False
             for i in settings.amer_diet:
                 if dish in i[0]:
-                    show_flag = i[1]
-                    break
-            if (self.left(dish) > 0) | show_flag:
+                    if i[1] is None:
+                        if (set(self.eaten.keys()) & set(i[0].keys())) == set():
+                            show = True
+                    if (i[1] is False) and (self.left(dish) > 0):
+                        show = True
+                    if i[1] is True:
+                        show = True
+            if show:
                 item = [
                     dish,
                     ' - ',
