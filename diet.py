@@ -10,7 +10,10 @@ class Diet:
     def __init__(self, name):
         self.name = name
         if self.load() is False:
-            self.menu = {k: eval(v) for k, v in settings.amer_diet.items()}
+            self.menu = dict()
+            for i in settings.amer_diet:
+                for k, v in i[0]:
+                    self.menu[k] = eval(v)
             self.eaten = {}
             self.factor = 0
             self.date = date.today().isoformat()
@@ -34,9 +37,13 @@ class Diet:
     def newday(self):
         if self.date != date.today().isoformat():
             self.change_factor()
-            for k, v in settings.amer_diet.items():
-                addition = eval(v) * settings.alfa ** self.factor
-                self.menu[k] += (addition - self.eaten.get(k, 0))
+            for i in settings.amer_diet:
+                for k, v in i[0].items():
+                    if i[2] is None:
+                        addition = eval(v)
+                    else:
+                        addition = eval(v) * i[2] ** self.factor
+                    self.menu[k] += (addition - self.eaten.get(k, 0))
             self.eaten = {}
             self.date = date.today().isoformat()
             self.save()
@@ -63,7 +70,12 @@ class Diet:
         menu = self.menu
         eaten = self.eaten
         for dish in sorted(menu):
-            if (self.left(dish) > 0) | (dish == settings.alco):
+            show_flag = False
+            for i in settings.amer_diet:
+                if dish in i[0]:
+                    show_flag = i[1]
+                    break
+            if (self.left(dish) > 0) | show_flag:
                 item = [
                     dish,
                     ' - ',
