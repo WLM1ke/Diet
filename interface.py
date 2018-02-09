@@ -1,4 +1,4 @@
-import Diet
+import diet
 import ui
 
 
@@ -7,7 +7,7 @@ class Interface(object):
     def __init__(self, diet_name):
         self.view = ui.TableView()
         self.view.present(style='full_screen', hide_title_bar=False)
-        self.diet = Diet.Diet(diet_name)
+        self.diet = diet.Diet(diet_name)
         self.view.name = 'Фактор диеты - ' + str(self.diet.factor)
         self.can_be_eaten = self.diet.can_be_eaten()
         items = [''.join(i) for i in self.can_be_eaten]

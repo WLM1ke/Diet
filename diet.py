@@ -1,27 +1,8 @@
 import json
 import dialogs
+import settings
 from datetime import date
 from pathlib import Path
-
-
-ALFA = 0.91
-ALCO = 'Alc, 28g/200cal'
-AMER_DIET = {  # 2600
-    'Veg Green, 1c':      '2.5/7*2',  # Чашка зелени равна 2 чашкам
-    'Veg Orange, 1c':     '7/7',
-    'Veg Legumes, 1c':    '2.5/7',
-    'Veg Starchy, 1c':    '7/7/10',  # Спринт по отказу от крахмалестых овощей
-    'Veg Other, 1c':      '5.5/7',
-    'Fruits, 1c':         '2.5',
-    'Grain Whole, 30g':   '4.5/10',  # Спринт по отказу от зерновых
-    'Grain Refined, 30g': '4.5/10',  # Спринт по отказу от зерновых
-    'Dairy, 150g':        '2.5*50/150',
-    'Prot Seafood, 100g': '17/7*30/100',
-    'Prot Meats, 100g':   '31/7*30/100',
-    'Nuts, 30g':          '5/7*15/30',
-    'Oils, 17g':          '34/34',
-    ALCO:                 '330/200'
-    }
 
 
 class Diet:
@@ -29,7 +10,7 @@ class Diet:
     def __init__(self, name):
         self.name = name
         if self.load() is False:
-            self.menu = {k: eval(v) for k, v in AMER_DIET.items()}
+            self.menu = {k: eval(v) for k, v in settings.amer_diet.items()}
             self.eaten = {}
             self.factor = 0
             self.date = date.today().isoformat()
@@ -53,8 +34,8 @@ class Diet:
     def newday(self):
         if self.date != date.today().isoformat():
             self.change_factor()
-            for k, v in AMER_DIET.items():
-                addition = eval(v) * ALFA ** self.factor
+            for k, v in settings.amer_diet.items():
+                addition = eval(v) * settings.alfa ** self.factor
                 self.menu[k] += (addition - self.eaten.get(k, 0))
             self.eaten = {}
             self.date = date.today().isoformat()
@@ -82,7 +63,7 @@ class Diet:
         menu = self.menu
         eaten = self.eaten
         for dish in sorted(menu):
-            if (self.left(dish) > min(0, self.left(ALCO))) | (dish == ALCO):
+            if (self.left(dish) > 0) | (dish == settings.alco):
                 item = [
                     dish,
                     ' - ',
